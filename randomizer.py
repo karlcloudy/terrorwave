@@ -5922,6 +5922,9 @@ def write_credits(boss_events, blue_chests, wild_jelly_map,
     CONFLICT_ITEMS = [0x1c2, 0x1c5,
                       0x19c, 0x19d, 0x19e, 0x19f, 0x1a0,
                       0x1a1, 0x1a2, 0x1a3, 0x1a4]
+    
+    if 'fourkeys' in get_activated_codes():
+        CONFLICT_ITEMS.remove(0x1c2) # Ancient [Cave] Key is useless in this mode.
 
     for item in CONFLICT_ITEMS:
         if item == iris_shop_item:
@@ -6444,6 +6447,7 @@ def make_four_keys():
                   'EVENT 9A-C-5E\n'
                   '0000. 00()\n')
     patch_game_script(patch_text)
+    patch_events('fourkeys_ac_key_fix', warn_double_import=False)
 
 
 def make_open_world(custom=None):
@@ -6476,9 +6480,14 @@ def make_open_world(custom=None):
     for rno in RoamingNPCObject.every:
         rno.map_index = 0xff
 
+    inescapable_zones = ['Overworld', 'Seafloor', 'Daos Shrine']
+    if 'karlloonescape' in get_activated_codes():
+        patch_events('karlloon_escape', warn_double_import=False)
+    else:
+        inescapable_zones += 'Karlloon Shrine'
+
     for meo in MapEventObject.every:
-        if meo.zone_name in {
-                'Overworld', 'Seafloor', 'Karlloon Shrine', 'Daos Shrine'}:
+        if meo.zone_name in inescapable_zones:
             meo.change_escapability(make_escapable=False)
         else:
             meo.change_escapability(make_escapable=True)
@@ -6531,13 +6540,25 @@ def make_open_world(custom=None):
     name = random.choice(VALID_LEADERS)
     character_recruitments = {'character0': name}
     starting_character = OpenNPCGenerator.get_properties_by_name(name)
+
     dual_blade = ItemObject.get(0x36)
     dual_blade.equipability = 0
     dual_blade.set_bit(starting_character.name, True)
 
+    # Shops only checks if Selan is wearing the Engage Ring for the discount.
+    # TODO: Patch to the starting (or any?) character instead?
+    engage_ring = ItemObject.get(0x167)
+    engage_ring.equipability = 0
+    engage_ring.set_bit('selan', True) 
+    
     warp = SpellObject.get(0x24)
     warp.characters |= 0x7f
     warp.mp_cost = 0
+
+    if 'freeescape' in get_activated_codes():
+        escape = SpellObject.get(0x25)
+        escape.characters |= 0x7f
+        escape.mp_cost = 0
 
     characters = ['maxim', 'selan', 'guy', 'artea', 'tia', 'dekar', 'lexis']
     characters.remove(name)
@@ -6746,6 +6767,11 @@ def make_open_world(custom=None):
     else:
         parameters['hidden_item'] = ''
 
+    if 'freeescape' in get_activated_codes():
+        parameters['escape_learn'] = '0220. 23({0}-25)'.format(starting_character_index)
+    else:
+        parameters['escape_learn'] = ''
+
     # Apply base patches BEFORE procedural modifications
     patch_with_template('open_world_events', parameters)
 
@@ -6793,6 +6819,9 @@ def make_open_world(custom=None):
 
     FILLER_ITEM = 0x2b
     EXTRA_CHESTS = [0x21, 0x2f]
+    CONFLICT_ITEMS = [0x19c, 0x19d, 0x19e, 0x19f, 0x1a0,
+                      0x1a1, 0x1a2, 0x1a3, 0x1a4,
+                      0x1c2, 0x1c5]
 
     MapEventObject.class_reseed('iris_items')
     conflict_chests = [c for c in ChestObject.every
@@ -6802,11 +6831,9 @@ def make_open_world(custom=None):
         conflict_chests += [c for c in ChestObject.every
                             if c.item.name.lower().endswith(' key')
                             and c.item.get_bit('unsellable')]
+        CONFLICT_ITEMS.remove(0x1c2) # Ancient [Cave] Key is useless in this mode.
     conflict_chests += [ChestObject.get(i) for i in EXTRA_CHESTS]
     conflict_chests = sorted(set(conflict_chests), key=lambda c: c.index)
-    CONFLICT_ITEMS = [0x19c, 0x19d, 0x19e, 0x19f, 0x1a0,
-                      0x1a1, 0x1a2, 0x1a3, 0x1a4,
-                      0x1c2, 0x1c5]
     IRIS_ITEMS = sorted(range(0x19c, 0x1a4))
     iris_shop_item, iris_thief_item = random.sample(IRIS_ITEMS, 2)
     CONFLICT_ITEMS.remove(iris_shop_item)
@@ -7032,6 +7059,8 @@ if __name__ == '__main__':
             'monstermash': ['monstermash'],
             'nocap': ['nocap'],
             'fourkeys': ['fourkeys'],
+            'karlloonescape': ['karlloonescape'],
+            'freeescape': ['freeescape']
         }
         run_interface(ALL_OBJECTS, snes=True, codes=codes,
                       custom_degree=True, custom_difficulty=True)

@@ -1,0 +1,102 @@
+EVENT F0-D-02 # NPC at front desk to check for ALL DUNGEON instead of Ancient (Useless) Key
+  0000. 14(C2-01C6-0001-40-FC-20-@51-FF) # If at least ALL DUNGEON x1 owned OR Flag FC ($079d:10) set then jump to @51
+  000C. 31(50-01)                      # Change Facing
+  000F. 13: <VOICE 50>Excuse me, sir, but you
+            can't go in. You see, you
+            still don't possess the
+            ALL DUNGEON key.<END MESSAGE>
+  004F. 1A(FC)                         # Set Event Flag FC ($079d:10)
+  # LABEL @51 $4d2cf
+  0051. 00()                           # End Event
+
+EVENT F1-D-01 # Patch out receiving Ancient (Useless) Key for AC win condition
+  0000. 15(FA-@101)                    # Branch on Flag FA ($079d:04)
+  0004. 4C(6F)                         # Play Sound
+  0006. 95(FF-00-3C)                   # Screen tint animation
+  000A. 33(01-03)                      # Move Character to Location
+  000D. 8D(00-01-08-00-00-00)          # Play Wave-Warping Animation
+  0014. 90(00-00-21)                   # Wave motion right-left
+  0018. 8E(00-B0-21)
+  001C. A1(00-00)
+  001F. 8F(00-B0-11)                   # Wave motion up-down
+  0023. 8E(00-90-E1)
+  0027. A1(00-00)
+  002A. 9F(00-E4-41)                   # Wave motion shrink
+  002E. 4C(33)                         # Play Sound
+  0030. 98(50-01)                      # Thunder Warp
+  0033. 9A(00)
+  0035. 97()
+  0036. 37(1E)                         # Pause
+  0038. 79()
+  0039. 13: <VOICE 50>I never imagined anyone
+            could make it this far...<END MESSAGE>
+  005B. 61: Who are...? Wait a minute,
+            you're just a blob of
+            jelly, right?<END MESSAGE>
+  0080. 13: <VOICE 50>Fool! I'm the strongest
+            and oldest of jellies.
+            I control everything in
+            this cave.<END MESSAGE>
+  00AF. 13: <VOICE 50>I am also the last enemy
+            you meet here. Since
+            you've come this far, show
+            me what you're made of!<END MESSAGE>
+  00EA. 10(02-@102-@1EC)               # Set Up Branching Event
+  00F0. 08: Fight.
+            Not fight.<CHOICE>
+  00FE. 1C(@1EC)                       # Jump
+  # LABEL @101 $4eb3f
+  0101. 00()                           # End Event
+  # LABEL @102 $4eb40
+  0102. 13: <VOICE 50>Now then! I'll show
+            you my gelatin
+            gestures!<END MESSAGE>
+  0120. 4B(1B)                         # Play BGM
+  0122. 53(26)                         # Invoke Battle (Master x1)
+  0124. 6F(17)                         # Change Music
+  0126. A4()                           # Screen Mosaic
+  0127. 76()
+  0128. 15(FE-@1FE)                    # Branch on Flag FE ($079d:40)
+  012C. 15(FF-@1FE)                    # Branch on Flag FF ($079d:80)
+  0130. 13: <VOICE 50>What power and ability!
+            I have to admit you're the
+            world's best warrior!<END MESSAGE>
+  015C. 13: <VOICE 50>I am honored to have
+            been able to fight with
+            one as brilliant as you.<END MESSAGE>
+  01E8. 1C(@23E)                       # Jump
+  01EB. 00()                           # End Event
+  # LABEL @1EC $4ec2a
+  01EC. 13: <VOICE 50>As you wish.<END MESSAGE>
+  01F7. 4C(70)                         # Play Sound
+  01F9. 99(50)
+  01FB. 89(50)
+  01FD. 00()                           # End Event
+  # LABEL @1FE $4ec3c
+  01FE. 13: <VOICE 50>Power you have, but it's
+            no match for the jelly
+            juggernaut, my friend.
+            Perhaps another time.<END MESSAGE>
+  023A. 1C(@24E)                       # Jump
+  023D. 00()                           # End Event
+  # LABEL @23E $4ec7c
+  023E. 13: <VOICE 50>Come back anytime.<END MESSAGE>
+  024A. 1C(@24E)                       # Jump
+  024D. 00()                           # End Event
+  # LABEL @24E $4ec8c
+  024E. 4C(6F)                         # Play Sound
+  0250. 95(FF-00-3C)                   # Screen tint animation
+  0254. 8D(00-01-01-78-00-00)          # Play Wave-Warping Animation
+  025B. 8F(00-00-81)                   # Wave motion up-down
+  025F. 90(00-00-81)                   # Wave motion right-left
+  0263. 9F(00-84-E1)                   # Wave motion shrink
+  0267. A2(00)
+  0269. 4C(70)                         # Play Sound
+  026B. 99(50)
+  026D. 89(50)
+  026F. 97()
+  0270. 4B(0A)                         # Play BGM
+  0272. 1A(FA)                         # Set Event Flag FA ($079d:04)
+  0274. 14(C0-002D-0000-30-@101-FF)    # If exactly Providence x0 owned then DON'T jump to @101
+  027E. 20(2D-01)                      # Get Item 0XX (Providence x1)
+  0281. 00()                           # End Event
