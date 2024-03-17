@@ -38,6 +38,8 @@ Secret Codes:
     airship                 Start the game with the airship.
     bossy                   Very random bosses (unbalanced even with scaling)
     fourkeys                Open World, but there are only four keys
+    karlloonescape          Enables the use of Escape spell/items in Karlloon Shrine
+    freeescape              Gives Escape spell to starting character, at a cost of 0 MP (similar to Warp)
 
     OPEN WORLD ENEMY SCALING
     scale                   Scale enemy status in open-world mode
